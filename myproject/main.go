@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/mysql" // Thay bằng "gorm.io/driver/mysql" nếu sử dụng MySQL
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -98,12 +98,21 @@ func renderHomePage(c *gin.Context) {
 }
 
 func main() {
-	initDB()
 	r := gin.Default()
+	
+	// Cấu hình template và static files
+	r.LoadHTMLGlob("templates/*")
+	
+	// Thử kết nối database sau khi đã thiết lập các route cơ bản
+	initDB()
+	
+	// Thêm route cho trang chủ
+	r.GET("/", renderHomePage)
+	r.GET("/index", renderHomePage)  // Thêm route thay thế
+	r.GET("/indexus", renderHomePage) // Giữ nguyên route cũ
 
-	r.LoadHTMLFiles("templates/index.html")
-	r.GET("/indexus", renderHomePage)
 	r.POST("/shorten", shortenURL)
 	r.GET("/:shortLink", redirectURL)
+	
 	r.Run(":8080")
 }
